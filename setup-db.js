@@ -1,8 +1,6 @@
 import postgres from 'postgres';
 
-// Fix URL encoding for special characters in password
-const databaseUrl = process.env.DATABASE_URL.replace(/\[/g, '%5B').replace(/\]/g, '%5D').replace(/#/g, '%23');
-const sql = postgres(databaseUrl);
+const sql = postgres(process.env.DATABASE_URL);
 
 async function setupDatabase() {
   try {
