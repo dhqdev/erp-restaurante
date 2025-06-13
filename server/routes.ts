@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { loginSchema, insertUserSchema, insertFoodSchema, insertTableSchema, insertOrderSchema } from "@shared/schema";
+import "./types";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
@@ -36,8 +37,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Store user in session (simplified - in production use proper session management)
-      req.session = { userId: user.id, userRole: user.role };
+      // Store user in session
+      req.session.userId = user.id;
+      req.session.userRole = user.role;
       
       res.json({
         user: {
@@ -54,16 +56,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    req.session = null;
-    res.json({ success: true });
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro ao fazer logout" });
+      }
+      res.clearCookie('connect.sid');
+      res.json({ success: true });
+    });
   });
 
   app.get("/api/auth/me", async (req, res) => {
-    if (!req.session?.userId) {
+    const userId = (req.session as any)?.userId;
+    if (!userId) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    const user = await storage.getUser(req.session.userId);
+    const user = await storage.getUser(userId);
     if (!user) {
       return res.status(401).json({ message: "Usuário não encontrado" });
     }

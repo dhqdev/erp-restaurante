@@ -1,10 +1,30 @@
 import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+
+const PgSession = connectPgSimple(session);
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Configure session management
+app.use(session({
+  store: new PgSession({
+    conString: process.env.DATABASE_URL,
+    tableName: 'user_sessions'
+  }),
+  secret: process.env.SESSION_SECRET || 'restaurant-secret-key-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // Set to true in production with HTTPS
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();
