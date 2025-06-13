@@ -1,0 +1,72 @@
+💡 PROMPT PARA CHATGPT CRIAR APP DE RESTAURANTE (COM SUPABASE, MENSALIDADE E TESTES):
+
+Quero que você desenvolva um aplicativo web interativo, responsivo e simples de usar para um restaurante, compatível com celular, tablet e computador.
+
+O sistema deve ter duas áreas principais com permissões distintas:
+
+1. Painel do Administrador (Gerente)
+Login seguro com autenticação via Supabase.
+
+Cadastro, edição e exclusão de usuários, com definição de nível de acesso (ex: gerente, garçom, caixa).
+
+CRUD completo de comidas e bebidas (nome, descrição, imagem, categoria e preço).
+
+Gestão financeira:
+
+Ver pagamentos do dia, mês e histórico.
+
+Exportar relatórios.
+
+Gestão de pedidos: visualizar, editar, excluir e finalizar pedidos.
+
+Aba de Mesas: criar, editar e excluir mesas disponíveis no restaurante. Cada mesa deve ter um identificador (ex: Mesa 01, Mesa 02...).
+
+Integração com o sistema de pagamento recorrente, redirecionando o cliente para:
+👉 https://pay.cakto.com.br/fna8efe_427848
+
+2. Painel do Garçom
+Login com autenticação, mas só pode:
+
+Ver e adicionar pedidos (nada de editar usuários ou acessar finanças).
+
+Selecionar mesa (das cadastradas pelo gerente), comidas, quantidades e observações.
+
+Enviar pedidos para a cozinha.
+
+Interface prática e otimizada para uso rápido no celular.
+
+Funcionalidades gerais:
+Período de teste de 7 dias para novos usuários (controlado via Supabase).
+
+Após o prazo, bloquear o uso e mostrar um aviso com botão para pagamento no link acima.
+
+Interface amigável com design moderno, responsivo e minimalista (pode usar Tailwind CSS ou outro framework UI leve).
+
+Testes automatizados com Cypress para:
+
+Login
+
+Cadastro de usuários
+
+Criação de pedidos
+
+Escolha da mesa
+
+Bloqueio após os 7 dias de teste
+
+Estrutura de dados no Supabase:
+Tabela users (com roles: admin, garcom)
+
+Tabela foods (com id, nome, categoria, descrição, preço, imagem)
+
+Tabela orders (pedido, status, itens, mesa, timestamps)
+
+Tabela tables (nome da mesa, status)
+
+Tabela payments (valores, datas, status)
+
+Tabela trial_status (user_id, data de início, ativo/inativo)
+
+Use RLS (Row-Level Security) para restringir acessos de acordo com a role do usuário.
+
+Se houver alguma funcionalidade importante que eu não mencionei, use sua criatividade e inclua.
