@@ -96,6 +96,10 @@
     @apply bg-primary/10 border-primary text-primary;
   }
   
+  .bg-primary\/10 {
+    background-color: hsl(var(--primary) / 0.1);
+  }
+  
   .category-btn.active {
     @apply bg-primary text-primary-foreground;
   }

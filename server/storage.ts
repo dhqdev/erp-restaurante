@@ -15,9 +15,7 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL must be set");
 }
 
-// Fix URL encoding for special characters in password
-const databaseUrl = process.env.DATABASE_URL.replace(/\[/g, '%5B').replace(/\]/g, '%5D').replace(/#/g, '%23');
-const sql_client = postgres(databaseUrl);
+const sql_client = postgres(process.env.DATABASE_URL);
 const db = drizzle(sql_client);
 
 export interface IStorage {
@@ -201,7 +199,7 @@ export class DrizzleStorage implements IStorage {
 
   async deleteOrder(id: number): Promise<boolean> {
     const result = await db.delete(orders).where(eq(orders.id, id));
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async getPayment(id: number): Promise<Payment | undefined> {
