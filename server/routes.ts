@@ -41,15 +41,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.userRole = user.role;
       
-      res.json({
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role
-        },
-        trialDaysLeft: trial && trial.startDate ? Math.max(0, 7 - Math.floor((new Date().getTime() - new Date(trial.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0
-      });
+      // Save session before responding
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Erro interno do servidor" });
+        }
+        
+          res.json({
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role
+            },
+            trialDaysLeft: trial && trial.startDate ? Math.max(0, 7 - Math.floor((new Date().getTime() - new Date(trial.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0
+          });
+        });
     } catch (error) {
       res.status(400).json({ message: "Dados inválidos" });
     }
@@ -256,7 +264,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Orders routes
   app.get("/api/orders", requireAuth, async (req, res) => {
-    const user = await storage.getUser(req.session.userId);
+    const userId = req.session.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+    const user = await storage.getUser(userId);
     if (!user) {
       return res.status(401).json({ message: "Usuário não encontrado" });
     }
@@ -274,13 +286,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", requireAuth, async (req, res) => {
     try {
       const orderData = insertOrderSchema.parse(req.body);
+      const waiterId = req.session.userId;
+      if (!waiterId) {
+        return res.status(401).json({ message: "Não autenticado" });
+      }
       const order = await storage.createOrder({
         ...orderData,
-        waiterId: req.session.userId
+        waiterId
       });
 
       // Update table status to occupied
-      await storage.updateTable(orderData.tableId, { status: "occupied" });
+      if (orderData.tableId) {
+        await storage.updateTable(orderData.tableId, { status: "occupied" });
+      }
 
       res.json(order);
     } catch (error) {
