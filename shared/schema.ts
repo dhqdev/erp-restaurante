@@ -15,9 +15,9 @@ export const users = pgTable("users", {
 export const trialStatus = pgTable("trial_status", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  startDate: timestamp("start_date").defaultNow(),
+  startDate: timestamp("start_date").notNull().defaultNow(),
   active: boolean("active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const foods = pgTable("foods", {

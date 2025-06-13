@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check trial status
       const trial = await storage.getTrialStatus(user.id);
-      if (trial) {
+      if (trial && trial.startDate) {
         const trialStart = new Date(trial.startDate);
         const now = new Date();
         const daysDiff = Math.floor((now.getTime() - trialStart.getTime()) / (1000 * 60 * 60 * 24));
@@ -48,7 +48,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: user.name,
           role: user.role
         },
-        trialDaysLeft: trial ? Math.max(0, 7 - Math.floor((new Date().getTime() - new Date(trial.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0
+        trialDaysLeft: trial && trial.startDate ? Math.max(0, 7 - Math.floor((new Date().getTime() - new Date(trial.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0
       });
     } catch (error) {
       res.status(400).json({ message: "Dados inválidos" });
@@ -66,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/auth/me", async (req, res) => {
-    const userId = (req.session as any)?.userId;
+    const userId = req.session.userId;
     if (!userId) {
       return res.status(401).json({ message: "Não autenticado" });
     }
@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: user.name,
         role: user.role
       },
-      trialDaysLeft: trial ? Math.max(0, 7 - Math.floor((new Date().getTime() - new Date(trial.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0
+      trialDaysLeft: trial && trial.startDate ? Math.max(0, 7 - Math.floor((new Date().getTime() - new Date(trial.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 0
     });
   });
 
