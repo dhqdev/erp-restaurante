@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { eq, desc, and, sql } from "drizzle-orm";
 import {
   users, trialStatus, foods, tables, orders, payments,
@@ -15,7 +15,9 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL must be set");
 }
 
-const sql_client = neon(process.env.DATABASE_URL);
+// Fix URL encoding for special characters in password
+const databaseUrl = process.env.DATABASE_URL.replace(/\[/g, '%5B').replace(/\]/g, '%5D').replace(/#/g, '%23');
+const sql_client = postgres(databaseUrl);
 const db = drizzle(sql_client);
 
 export interface IStorage {
@@ -96,7 +98,7 @@ export class DrizzleStorage implements IStorage {
 
   async deleteUser(id: number): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id));
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -142,7 +144,7 @@ export class DrizzleStorage implements IStorage {
 
   async deleteFood(id: number): Promise<boolean> {
     const result = await db.update(foods).set({ active: false }).where(eq(foods.id, id));
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async getTable(id: number): Promise<Table | undefined> {
@@ -166,7 +168,7 @@ export class DrizzleStorage implements IStorage {
 
   async deleteTable(id: number): Promise<boolean> {
     const result = await db.delete(tables).where(eq(tables.id, id));
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async getOrder(id: number): Promise<Order | undefined> {
