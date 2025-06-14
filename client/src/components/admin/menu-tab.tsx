@@ -56,12 +56,13 @@ export default function MenuTab() {
     return <div>Carregando...</div>;
   }
 
-  const totalItems = foods?.length || 0;
-  const activeItems = foods?.filter(f => f.active)?.length || 0;
-  const inactiveItems = foods?.filter(f => !f.active)?.length || 0;
-  const categories = [...new Set(foods?.map(f => f.category) || [])];
-  const averagePrice = foods?.length > 0 
-    ? (foods.reduce((sum, f) => sum + parseFloat(f.price), 0) / foods.length).toFixed(2)
+  const foodsArray = foods as Food[] || [];
+  const totalItems = foodsArray.length;
+  const activeItems = foodsArray.filter((f: Food) => f.active).length;
+  const inactiveItems = foodsArray.filter((f: Food) => !f.active).length;
+  const categories = Array.from(new Set(foodsArray.map((f: Food) => f.category)));
+  const averagePrice = foodsArray.length > 0 
+    ? (foodsArray.reduce((sum: number, f: Food) => sum + parseFloat(f.price), 0) / foodsArray.length).toFixed(2)
     : "0.00";
 
   return (
