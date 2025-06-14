@@ -56,8 +56,68 @@ export default function MenuTab() {
     return <div>Carregando...</div>;
   }
 
+  const totalItems = foods?.length || 0;
+  const activeItems = foods?.filter(f => f.active)?.length || 0;
+  const inactiveItems = foods?.filter(f => !f.active)?.length || 0;
+  const categories = [...new Set(foods?.map(f => f.category) || [])];
+  const averagePrice = foods?.length > 0 
+    ? (foods.reduce((sum, f) => sum + parseFloat(f.price), 0) / foods.length).toFixed(2)
+    : "0.00";
+
   return (
     <>
+      {/* Resumo do Cardápio */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total de Itens</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalItems}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-green-600">Ativos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{activeItems}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-red-600">Inativos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{inactiveItems}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-blue-600">Preço Médio</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">R$ {averagePrice}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Categorias */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Categorias ({categories.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category, index) => (
+              <Badge key={index} variant="outline" className="px-3 py-1">
+                {category} ({foods?.filter(f => f.category === category).length})
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">

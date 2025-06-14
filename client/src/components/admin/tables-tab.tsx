@@ -69,8 +69,50 @@ export default function TablesTab() {
     return <div>Carregando...</div>;
   }
 
+  const tablesArray = tables as TableType[] || [];
+  const availableTables = tablesArray.filter((t: TableType) => t.status === "available").length;
+  const occupiedTables = tablesArray.filter((t: TableType) => t.status === "occupied").length;
+  const reservedTables = tablesArray.filter((t: TableType) => t.status === "reserved").length;
+  const totalTables = tablesArray.length;
+
   return (
     <>
+      {/* Resumo das Mesas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total de Mesas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalTables}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-green-600">Disponíveis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{availableTables}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-red-600">Ocupadas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{occupiedTables}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-yellow-600">Reservadas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{reservedTables}</div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">

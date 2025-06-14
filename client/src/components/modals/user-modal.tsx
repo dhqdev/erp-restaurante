@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,14 +28,41 @@ export default function UserModal({ isOpen, onClose, user }: UserModalProps) {
 
   const form = useForm<InsertUser>({
     resolver: zodResolver(userFormSchema),
-    defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
-      role: user?.role || "garcom",
+    defaultValues: user ? {
+      name: user.name,
+      email: user.email,
+      role: user.role,
       password: "",
-      active: user?.active ?? true,
+      active: user.active,
+    } : {
+      name: "",
+      email: "",
+      role: "garcom",
+      password: "",
+      active: true,
     },
   });
+
+  // Reset form when user changes
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        password: "",
+        active: user.active,
+      });
+    } else {
+      form.reset({
+        name: "",
+        email: "",
+        role: "garcom",
+        password: "",
+        active: true,
+      });
+    }
+  }, [user, form]);
 
   const mutation = useMutation({
     mutationFn: (data: InsertUser) => {
